@@ -1,0 +1,26 @@
+{
+  "name": "myplayer",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "description": "MYplayer — a personal, offline-first music player PWA with a native iOS feel",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview --host",
+    "phone": "node scripts/tailscale.mjs",
+    "tunnel": "node scripts/tunnel.mjs",
+    "icons": "node scripts/make-icons.mjs"
+  },
+  "dependencies": {
+    "motion": "^12.34.2",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.3.3",
+    "@vitejs/plugin-react": "^6.0.5",
+    "tailwindcss": "^4.3.3",
+    "vite": "^8.2.0"
+  }
+}

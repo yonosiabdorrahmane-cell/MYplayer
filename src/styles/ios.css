@@ -1,0 +1,655 @@
+/* =========================================================================
+   MYplayer — Liquid Glass design system
+
+   Chrome is built from floating glass, not docked bars: every surface is a
+   lens that content scrolls underneath, with a specular rim, an internal
+   sheen, and a cast shadow that lifts it off the page.
+   ========================================================================= */
+
+:root {
+  /* --- Type ramp (SF Pro metrics) ------------------------------------- */
+  --font-ios:
+    -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'SF Pro Display', 'Segoe UI', Roboto,
+    'Helvetica Neue', Arial, sans-serif;
+  --font-rounded:
+    ui-rounded, -apple-system, 'SF Pro Rounded', 'SF Pro Display', system-ui, sans-serif;
+
+  /* --- Accent --------------------------------------------------------- */
+  --tint: #fa2b56;
+  --tint-pressed: #d81f45;
+
+  /* --- Motion ---------------------------------------------------------- */
+  --ease-ios: cubic-bezier(0.32, 0.72, 0, 1);
+  --ease-out-ios: cubic-bezier(0.19, 1, 0.22, 1);
+  --ease-in-out-ios: cubic-bezier(0.65, 0, 0.35, 1);
+  /* Overshoots slightly — the "liquid" settle. */
+  --ease-liquid: cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  /* --- Metrics --------------------------------------------------------- */
+  --nav-h: 44px;
+  --tab-h: 58px;
+  --mini-h: 60px;
+  --chrome-gutter: 12px;
+  --safe-top: max(env(safe-area-inset-top, 0px), 10px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left: env(safe-area-inset-left, 0px);
+  --safe-right: env(safe-area-inset-right, 0px);
+}
+
+/* --- Light appearance ------------------------------------------------- */
+:root {
+  --bg: #f2f2f7;
+  --bg-elevated: #ffffff;
+  --bg-plain: #ffffff;
+  --bg-tertiary: #f2f2f7;
+
+  --label: #000000;
+  --label-2: rgba(60, 60, 67, 0.6);
+  --label-3: rgba(60, 60, 67, 0.3);
+  --label-4: rgba(60, 60, 67, 0.18);
+
+  --separator: rgba(60, 60, 67, 0.29);
+  --separator-opaque: #c6c6c8;
+
+  --fill-1: rgba(120, 120, 128, 0.2);
+  --fill-2: rgba(120, 120, 128, 0.16);
+  --fill-3: rgba(118, 118, 128, 0.12);
+  --fill-4: rgba(116, 116, 128, 0.08);
+
+  /* Glass: a bright lens over light content. */
+  --glass-tint: linear-gradient(
+    142deg,
+    rgba(255, 255, 255, 0.72) 0%,
+    rgba(255, 255, 255, 0.44) 42%,
+    rgba(255, 255, 255, 0.62) 100%
+  );
+  --glass-filter: blur(26px) saturate(190%) brightness(1.06);
+  /* The specular rim: bright where light lands, faint through the middle.
+     The cool and warm stops are a stand-in for the chromatic fringe real
+     glass shows at its edges — barely visible alone, but it stops the rim
+     reading as flat white. */
+  --glass-rim: linear-gradient(
+    142deg,
+    rgba(255, 255, 255, 0.98) 0%,
+    rgba(214, 226, 255, 0.42) 18%,
+    rgba(255, 255, 255, 0.2) 34%,
+    rgba(160, 160, 175, 0.14) 58%,
+    rgba(255, 240, 226, 0.46) 84%,
+    rgba(255, 255, 255, 0.88) 100%
+  );
+  --glass-sheen: radial-gradient(125% 82% at 50% -24%, rgba(255, 255, 255, 0.72), transparent 62%);
+  /* Bright rim, then a faint dark band just inside it — light bouncing back
+     off the inner wall of the glass. */
+  --glass-inner: inset 0 1px 1px rgba(255, 255, 255, 0.95),
+    inset 0 -1px 1px rgba(255, 255, 255, 0.45), inset 0 0 6px rgba(90, 90, 110, 0.07);
+  /* A tight contact shadow under a wide ambient one. */
+  --glass-shadow: 0 1px 2px rgba(0, 0, 0, 0.1), 0 12px 34px rgba(0, 0, 0, 0.15),
+    0 0 0 0.5px rgba(0, 0, 0, 0.05);
+
+  /* Transient "thicker glass" that gathers under a finger. */
+  --glass-blob-tint: linear-gradient(
+    150deg,
+    rgba(255, 255, 255, 0.96) 0%,
+    rgba(255, 255, 255, 0.6) 55%,
+    rgba(255, 255, 255, 0.86) 100%
+  );
+  --glass-blob-rim: linear-gradient(
+    150deg,
+    rgba(255, 255, 255, 1) 0%,
+    rgba(210, 224, 255, 0.5) 26%,
+    rgba(180, 180, 200, 0.18) 58%,
+    rgba(255, 236, 220, 0.55) 84%,
+    rgba(255, 255, 255, 0.95) 100%
+  );
+  --glass-blob-shadow: 0 5px 16px rgba(0, 0, 0, 0.14),
+    inset 0 1px 1.5px rgba(255, 255, 255, 1), inset 0 -1px 2px rgba(120, 120, 140, 0.14);
+  --glass-touch: rgba(255, 255, 255, 0.6);
+
+  --shadow-card: 0 12px 34px rgba(0, 0, 0, 0.18), 0 2px 8px rgba(0, 0, 0, 0.08);
+  --scrim: rgba(0, 0, 0, 0.22);
+  color-scheme: light;
+}
+
+/* --- Dark appearance -------------------------------------------------- */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #000000;
+    --bg-elevated: #1c1c1e;
+    --bg-plain: #000000;
+    --bg-tertiary: #2c2c2e;
+
+    --label: #ffffff;
+    --label-2: rgba(235, 235, 245, 0.6);
+    --label-3: rgba(235, 235, 245, 0.3);
+    --label-4: rgba(235, 235, 245, 0.18);
+
+    --separator: rgba(84, 84, 88, 0.65);
+    --separator-opaque: #38383a;
+
+    --fill-1: rgba(120, 120, 128, 0.36);
+    --fill-2: rgba(120, 120, 128, 0.32);
+    --fill-3: rgba(118, 118, 128, 0.24);
+    --fill-4: rgba(116, 116, 128, 0.18);
+
+    /* Dark glass stays translucent rather than going grey — the light comes
+       from the rim and the sheen, not from the fill. */
+    --glass-tint: linear-gradient(
+      142deg,
+      rgba(150, 150, 165, 0.26) 0%,
+      rgba(120, 120, 135, 0.16) 44%,
+      rgba(150, 150, 165, 0.22) 100%
+    );
+    /* Enough blur and fill that labels underneath turn into colour rather than
+       readable text — glass should carry its own content, not compete. */
+    --glass-filter: blur(34px) saturate(185%) brightness(1.1);
+    --glass-rim: linear-gradient(
+      142deg,
+      rgba(255, 255, 255, 0.86) 0%,
+      rgba(190, 212, 255, 0.34) 18%,
+      rgba(255, 255, 255, 0.12) 36%,
+      rgba(255, 255, 255, 0.05) 58%,
+      rgba(255, 226, 200, 0.3) 84%,
+      rgba(255, 255, 255, 0.58) 100%
+    );
+    --glass-sheen: radial-gradient(125% 82% at 50% -24%, rgba(255, 255, 255, 0.3), transparent 60%);
+    --glass-inner: inset 0 1px 1px rgba(255, 255, 255, 0.4),
+      inset 0 -1px 1px rgba(255, 255, 255, 0.12), inset 0 0 8px rgba(0, 0, 0, 0.18);
+    --glass-shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 14px 40px rgba(0, 0, 0, 0.55);
+
+    --glass-blob-tint: linear-gradient(
+      150deg,
+      rgba(255, 255, 255, 0.34) 0%,
+      rgba(255, 255, 255, 0.15) 55%,
+      rgba(255, 255, 255, 0.26) 100%
+    );
+    --glass-blob-rim: linear-gradient(
+      150deg,
+      rgba(255, 255, 255, 0.98) 0%,
+      rgba(190, 212, 255, 0.42) 26%,
+      rgba(255, 255, 255, 0.1) 58%,
+      rgba(255, 226, 200, 0.36) 84%,
+      rgba(255, 255, 255, 0.8) 100%
+    );
+    --glass-blob-shadow: 0 6px 20px rgba(0, 0, 0, 0.45),
+      inset 0 1px 1.5px rgba(255, 255, 255, 0.6), inset 0 -1px 2px rgba(0, 0, 0, 0.3);
+    --glass-touch: rgba(255, 255, 255, 0.34);
+
+    --shadow-card: 0 16px 40px rgba(0, 0, 0, 0.6), 0 2px 10px rgba(0, 0, 0, 0.4);
+    --scrim: rgba(0, 0, 0, 0.42);
+    color-scheme: dark;
+  }
+}
+
+@layer base {
+  * {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  html,
+  body,
+  #root {
+    height: 100%;
+  }
+
+  body {
+    margin: 0;
+    background: var(--bg-plain);
+    color: var(--label);
+    font-family: var(--font-ios);
+    font-size: 17px;
+    line-height: 22px;
+    letter-spacing: -0.408px;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    overscroll-behavior: none;
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+    overflow: hidden;
+    touch-action: manipulation;
+  }
+
+  input,
+  textarea {
+    -webkit-user-select: text;
+    user-select: text;
+    font-family: inherit;
+  }
+
+  button {
+    font-family: inherit;
+    color: inherit;
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+  }
+
+  .ios-scroll {
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-y: contain;
+    scrollbar-width: none;
+  }
+  .ios-scroll::-webkit-scrollbar {
+    width: 0;
+    height: 0;
+  }
+}
+
+@layer components {
+  /* =======================================================================
+     Typography
+     ======================================================================= */
+
+  .t-large-title {
+    font-size: 34px;
+    line-height: 41px;
+    font-weight: 700;
+    letter-spacing: 0.374px;
+  }
+  .t-title2 {
+    font-size: 22px;
+    line-height: 28px;
+    font-weight: 700;
+    letter-spacing: 0.35px;
+  }
+  .t-title3 {
+    font-size: 20px;
+    line-height: 25px;
+    font-weight: 600;
+    letter-spacing: 0.38px;
+  }
+  .t-headline {
+    font-size: 17px;
+    line-height: 22px;
+    font-weight: 600;
+    letter-spacing: -0.408px;
+  }
+  .t-body {
+    font-size: 17px;
+    line-height: 22px;
+    letter-spacing: -0.408px;
+  }
+  .t-callout {
+    font-size: 16px;
+    line-height: 21px;
+    letter-spacing: -0.32px;
+  }
+  .t-subhead {
+    font-size: 15px;
+    line-height: 20px;
+    letter-spacing: -0.24px;
+  }
+  .t-footnote {
+    font-size: 13px;
+    line-height: 18px;
+    letter-spacing: -0.078px;
+  }
+  .t-caption {
+    font-size: 12px;
+    line-height: 16px;
+  }
+  .t-caption2 {
+    font-size: 11px;
+    line-height: 13px;
+  }
+  .tabular {
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: 'tnum';
+  }
+
+  /* =======================================================================
+     Liquid Glass
+     -----------------------------------------------------------------------
+     Four stacked layers make the material read as a solid piece of glass:
+       1. the tint fill, angled so one corner catches more light
+       2. the backdrop lens (blur + saturation + a brightness lift)
+       3. ::before — a 1px specular rim, drawn as a masked gradient border
+       4. ::after  — the internal sheen falling from the top edge
+     ======================================================================= */
+
+  .glass {
+    position: relative;
+    isolation: isolate;
+    background-image: var(--glass-tint);
+    backdrop-filter: var(--glass-filter);
+    -webkit-backdrop-filter: var(--glass-filter);
+    box-shadow: var(--glass-inner), var(--glass-shadow);
+  }
+
+  /* `isolation: isolate` on .glass keeps these negative layers inside the
+     element: they paint over its own background but under its children, so
+     nothing has to opt in with a z-index of its own. */
+  .glass::before,
+  .glass::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    z-index: -1;
+  }
+
+  /* The rim. Painting a gradient into a 1px ring needs the mask/xor trick —
+     a plain border can only take a flat colour. */
+  .glass::before {
+    padding: 1px;
+    background: var(--glass-rim);
+    -webkit-mask:
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask:
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    mask-composite: exclude;
+  }
+
+  .glass::after {
+    background: var(--glass-sheen);
+  }
+
+  /**
+   * A thicker slab of glass that gathers under a finger — the tab bar's press
+   * state and its selection pill.
+   *
+   * Deliberately has no backdrop-filter of its own: it always sits inside a
+   * .glass surface, and `isolation: isolate` there makes that surface a
+   * backdrop root, so a nested filter would sample its parent instead of the
+   * page and come out flat. A bright fill layered over an existing lens reads
+   * as thicker glass anyway.
+   */
+  .glass-blob {
+    position: relative;
+    isolation: isolate;
+    background-image: var(--glass-blob-tint);
+    box-shadow: var(--glass-blob-shadow);
+  }
+
+  .glass-blob::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    z-index: -1;
+    padding: 1px;
+    background: var(--glass-blob-rim);
+    -webkit-mask:
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask:
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    mask-composite: exclude;
+  }
+
+  /* Thinner variant for small controls, where a heavy lens looks muddy. */
+  .glass-thin {
+    --glass-filter: blur(18px) saturate(180%) brightness(1.14);
+  }
+
+  /* Heavier variant for sheets and menus that need to carry text. */
+  .glass-thick {
+    --glass-filter: blur(38px) saturate(200%) brightness(1.1);
+  }
+
+  /* Glass that reacts to touch: it compresses, brightens, and springs back. */
+  .glass-press {
+    transition:
+      transform 0.44s var(--ease-liquid),
+      filter 0.34s var(--ease-out-ios);
+  }
+  .glass-press:active {
+    transform: scale(0.93);
+    filter: brightness(1.16);
+    transition-duration: 0.12s, 0.12s;
+  }
+
+  /* =======================================================================
+     Legacy flat materials — still used behind full-bleed sheets
+     ======================================================================= */
+
+  .material {
+    background: var(--glass-tint);
+    backdrop-filter: var(--glass-filter);
+    -webkit-backdrop-filter: var(--glass-filter);
+  }
+
+  .hairline-b {
+    box-shadow: inset 0 -0.5px 0 var(--separator);
+  }
+  .hairline-t {
+    box-shadow: inset 0 0.5px 0 var(--separator);
+  }
+
+  /* =======================================================================
+     Interaction
+     ======================================================================= */
+
+  .row-press {
+    transition: background-color 0.32s var(--ease-out-ios);
+  }
+  .row-press:active {
+    background-color: var(--fill-3);
+    transition-duration: 0s;
+  }
+
+  .bar-btn {
+    transition:
+      opacity 0.18s var(--ease-out-ios),
+      transform 0.34s var(--ease-liquid);
+  }
+  .bar-btn:active {
+    opacity: 0.4;
+    transform: scale(0.9);
+    transition-duration: 0s, 0.1s;
+  }
+
+  .springy {
+    transition: transform 0.44s var(--ease-liquid);
+  }
+  .springy:active {
+    transform: scale(0.9);
+    transition-duration: 0.1s;
+  }
+
+  /* =======================================================================
+     Utilities
+     ======================================================================= */
+
+  .artwork {
+    background: linear-gradient(160deg, var(--fill-2), var(--fill-4));
+    object-fit: cover;
+    box-shadow: inset 0 0 0 0.5px rgba(128, 128, 128, 0.22);
+  }
+
+  .truncate-1 {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
+/* =========================================================================
+   Keyframes
+   ========================================================================= */
+
+@keyframes marquee {
+  0%,
+  12% {
+    transform: translateX(0);
+  }
+  50%,
+  62% {
+    transform: translateX(var(--marquee-shift, 0px));
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+.marquee-run {
+  animation: marquee var(--marquee-duration, 12s) var(--ease-in-out-ios) infinite;
+}
+
+@keyframes spin-slow {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes eq-bar {
+  0%,
+  100% {
+    transform: scaleY(0.28);
+  }
+  50% {
+    transform: scaleY(1);
+  }
+}
+
+/* The slow drift of light across a glass surface at rest. */
+@keyframes glass-drift {
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+/* =========================================================================
+   Aurora — the app's own identity
+
+   MYplayer is near-black, and every colour in it comes from the record that
+   is playing. The palette is pulled out of the cover art and written to these
+   properties by AuroraContext; everything else in the interface reads them.
+
+   Registering them with @property is what makes that a crossfade rather than
+   a cut: an unregistered custom property is just a string to the browser and
+   cannot be interpolated, so the whole app would snap between songs.
+   ========================================================================= */
+
+@property --accent {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: hsl(258 62% 66%);
+}
+@property --accent-2 {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: hsl(288 58% 62%);
+}
+@property --accent-glow {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: hsla(258, 62%, 66%, 0.45);
+}
+@property --aurora-a {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: hsla(258, 55%, 52%, 0.3);
+}
+@property --aurora-b {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: hsla(288, 55%, 52%, 0.24);
+}
+@property --aurora-c {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: hsla(228, 55%, 52%, 0.22);
+}
+
+/* Last :root wins in both appearances — the aurora identity is dark, full stop.
+   A near-black ground is what lets a colour lifted from a cover read as light
+   rather than as paint. */
+:root {
+  --bg: #08080c;
+  --bg-elevated: rgba(28, 28, 38, 0.72);
+  --bg-plain: #08080c;
+  --bg-tertiary: rgba(38, 38, 50, 0.6);
+
+  --label: #f5f5fa;
+  --label-2: rgba(230, 230, 245, 0.62);
+  --label-3: rgba(230, 230, 245, 0.33);
+  --label-4: rgba(230, 230, 245, 0.17);
+
+  --separator: rgba(130, 130, 160, 0.22);
+  --separator-opaque: #1e1e26;
+
+  /* The one accent in the app, and it belongs to the song. */
+  --tint: var(--accent);
+  --tint-pressed: var(--accent-2);
+
+  transition:
+    --accent 1100ms var(--ease-ios),
+    --accent-2 1100ms var(--ease-ios),
+    --accent-glow 1100ms var(--ease-ios),
+    --aurora-a 1400ms var(--ease-ios),
+    --aurora-b 1400ms var(--ease-ios),
+    --aurora-c 1400ms var(--ease-ios);
+}
+
+/**
+ * The ground the whole app sits on: near-black with three vast, soft pools of
+ * the song's colour drifting across it on different periods, so the light
+ * never repeats the same way twice.
+ */
+.aurora-surface {
+  background-color: var(--bg-plain);
+  background-image:
+    radial-gradient(58% 44% at 18% 10%, var(--aurora-a) 0%, transparent 68%),
+    radial-gradient(54% 42% at 84% 26%, var(--aurora-b) 0%, transparent 66%),
+    radial-gradient(74% 54% at 46% 104%, var(--aurora-c) 0%, transparent 72%);
+  background-size:
+    170% 170%,
+    155% 155%,
+    190% 190%;
+  background-position:
+    0% 0%,
+    100% 0%,
+    50% 100%;
+  animation: aurora-drift 44s var(--ease-in-out-ios) infinite alternate;
+}
+
+@keyframes aurora-drift {
+  0% {
+    background-position:
+      0% 0%,
+      100% 0%,
+      50% 100%;
+  }
+  50% {
+    background-position:
+      26% 14%,
+      70% 20%,
+      34% 86%;
+  }
+  100% {
+    background-position:
+      10% 26%,
+      94% 2%,
+      64% 96%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+
+  /* The drift is the one animation worth keeping slow rather than killing —
+     but reduced motion means reduced motion. */
+  .aurora-surface {
+    animation: none;
+  }
+}
